@@ -1,0 +1,2 @@
+# RainbowColorizer
+兼容多行用于文字染色的python函数
