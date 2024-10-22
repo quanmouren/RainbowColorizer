@@ -107,8 +107,14 @@ class RC():
         for match in matches:
             r, g, b = map(int, match)
             text = text.replace(f"[({r},{g},{b})]", f"\033[38;2;{r};{g};{b}m")
+        pattern = r'\[bg\((\d+),(\d+),(\d+)\)\]'
+        matches = re.findall(pattern, text)
+        for match in matches:
+            r, g, b = map(int, match)
+            text = text.replace(f"[bg({r},{g},{b})]", f"\033[48;2;{r};{g};{b}m")
         return text + "\033[0m"
     
+
 
 
 if __name__ == "__main__":
@@ -120,7 +126,10 @@ if __name__ == "__main__":
  |_|  \_\__,_|_|_| |_|_.__/ \___/ \_/\_/    \_____\___/|_|\___/|_|  |_/___\___|_|"""
     print(RC.RainbowColorizer(logo))
     print(RC.RainbowColorizer("Welcome to Rainbow Colorizer"))
-    RC.separator("/","title")
+    RC.separator("/","Better looking dividing lines")
     print(RC.RainbowColorizer("Use ") + "\033[31m[red]ANSI\033[0m" + RC.RainbowColorizer(" escape sequences more easily"))
-    text = """######\n######\n######"""
+    text = """##################\nCooler  four-color \ngradient rendering 
+function\n##################"""
     print(RC.colors4(text))
+    print(RC.color("[bg(255,192,203)][red]Simpler background color dyeing[r]"))
+    
