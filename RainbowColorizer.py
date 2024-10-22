@@ -18,6 +18,13 @@ def hue_to_rgb(hue, saturation=1, value=1):
     else:r, g, b = value, p, q
     return int(r * 255), int(g * 255), int(b * 255)
 
+def interpolateColors(color1, color2, t):
+    # Linear interpolation between two RGB colors
+    r = int(color1[0] + (color2[0] - color1[0]) * t)
+    g = int(color1[1] + (color2[1] - color1[1]) * t)
+    b = int(color1[2] + (color2[2] - color1[2]) * t)
+    return r,g,b
+
 class RC():
     def RainbowColorizer(text, start_color=(255, 255, 0), end_color=(0, 255, 255)):
         lines = text.split('\n')
@@ -29,10 +36,24 @@ class RC():
                 diagonal_pos = line_index + char_index
                 if max_length < 5: max_length = 5
                 t = diagonal_pos / (num_lines + max_length - 2)
-                r = int(start_color[0] + (end_color[0] - start_color[0]) * t)
-                g = int(start_color[1] + (end_color[1] - start_color[1]) * t)
-                b = int(start_color[2] + (end_color[2] - start_color[2]) * t)
+                r,g,b = interpolateColors(start_color,end_color,t)
                 result += f"\033[38;2;{r};{g};{b}m{char}"
+            result += "\033[0m\n"
+        return result.rstrip('\n')
+    
+    def colors4(text, topLeftColor=(0, 255, 255), topRightColor=(64, 0, 255), bottomLeftColor=(128, 0, 255), bottomRightColor=(192, 0, 255)):
+        lines = text.split('\n')
+        num_lines = len(lines)
+        max_length = max(len(line) for line in lines)
+        result = ""
+        for line_index, line in enumerate(lines):
+            for char_index, char in enumerate(line.ljust(max_length)):
+                norm_line_index = line_index / (num_lines - 1) if num_lines > 1 else 0
+                norm_char_index = char_index / (max_length - 1) if max_length > 1 else 0
+                top_color = interpolateColors(topLeftColor, topRightColor, norm_char_index)
+                bottom_color = interpolateColors(bottomLeftColor, bottomRightColor, norm_char_index)
+                final_color = interpolateColors(top_color, bottom_color, norm_line_index)
+                result += f"\033[38;2;{final_color[0]};{final_color[1]};{final_color[2]}m{char}"
             result += "\033[0m\n"
         return result.rstrip('\n')
 
@@ -101,3 +122,32 @@ if __name__ == "__main__":
     print(RC.RainbowColorizer("Welcome to Rainbow Colorizer"))
     RC.separator("/","title")
     print(RC.RainbowColorizer("Use ") + "\033[31m[red]ANSI\033[0m" + RC.RainbowColorizer(" escape sequences more easily"))
+
+
+
+text = """
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+
+"""
+
+
+print(RC.colors4(text))
