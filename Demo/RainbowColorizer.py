@@ -26,6 +26,9 @@ def interpolateColors(color1, color2, t):
     return r,g,b
 
 def statisticsHWC(text):  # 统计中文数量/统计全角字符数量
+    """
+    bug:没有计算中文标点符号
+    """
     count = 0
     for char in text:
         if '\u4e00' <= char <= '\u9fff':
@@ -120,6 +123,9 @@ class RC():
         return text + "\033[0m"
     
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
+        """
+        有个bug空格和中文会导致计算颜色时越长的内容颜色计算错误
+        """
         lines = text.split("\n")
         if not isinstance(filler, list):
             if filler == "help" or filler == "?":
@@ -154,9 +160,38 @@ class RC():
                 return RCdef(a)
         else:
             return RC.RainbowColorizer(a)
+        
     def r(text):
         return re.sub(r'\033\[[\d;]*m', '', text)
+    
+    def right(text):
+        lines = text.split("\n")
+        max_width = max(len(line) + statisticsHWC(line) for line in lines)
+        a_lines = []
+        for line in lines:
+            a_lines.append(f"{(max_width - (len(line) + statisticsHWC(line))) * ' '}{line}")
+        return '\n'.join(a_lines)
 
+    def joinH(text1,text2):
+        text1 = RC.r(text1)
+        text2 = RC.r(text2)
+        lines1 = text1.split('\n')
+        lines2 = text2.split('\n')
+        max_height = max(len(lines1), len(lines2))
+        min_height = min(len(lines1), len(lines2))
+        def buQiHangShu(lines):
+            max_width = max(len(line) + statisticsHWC(line) for line in lines)
+            a_lines = []
+            for line in lines:
+                a_lines.append(f"{line}{(max_width - (len(line) + statisticsHWC(line))) * ' '}")
+            a = '\n'.join(a_lines) + (("\n" + (" " * max_width)) * (max_height - min_height))
+            return a.split('\n')
+        lines2 = buQiHangShu(lines2)
+        lines1 = buQiHangShu(lines1)
+        tlines = []
+        for i in range(len(lines1)):
+            tlines.append(f"{lines1[i]}{lines2[i]}")
+        return '\n'.join(tlines)
 
 if __name__ == "__main__":
     logo = r"""  _____       _       _                      _____      _            _              
@@ -173,4 +208,3 @@ if __name__ == "__main__":
 function\n##################"""
     print(RC.colors4(text))
     print(RC.color("[bg(255,192,203)][red]Simpler background color dyeing[r]"))
-    
