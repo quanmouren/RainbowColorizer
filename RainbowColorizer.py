@@ -172,28 +172,29 @@ class RC():
             a_lines.append(f"{(max_width - (len(line) + statisticsHWC(line))) * ' '}{line}")
         return '\n'.join(a_lines)
 
-    def joinH(text1,text2):
-        """
-        bug:text2行数大于text1时会获取不到行,没有补行
-        """
+    def joinH(text1, text2):
         text1 = RC.r(text1)
         text2 = RC.r(text2)
         lines1 = text1.split('\n')
         lines2 = text2.split('\n')
         max_height = max(len(lines1), len(lines2))
-        min_height = min(len(lines1), len(lines2))
-        def buQiHangShu(lines):
-            max_width = max(len(line) + statisticsHWC(line) for line in lines)
+        def buQiHang(lines, max_width):
             a_lines = []
             for line in lines:
-                a_lines.append(f"{line}{(max_width - (len(line) + statisticsHWC(line))) * ' '}")
-            a = '\n'.join(a_lines) + (("\n" + (" " * max_width)) * (max_height - min_height))
-            return a.split('\n')
-        lines2 = buQiHangShu(lines2)
-        lines1 = buQiHangShu(lines1)
-        tlines = []
-        for i in range(len(lines1)):
-            tlines.append(f"{lines1[i]}{lines2[i]}")
+                line_width = len(line) + statisticsHWC(line)
+                padding = ' ' * (max_width - line_width)
+                a_lines.append(line + padding)
+            return a_lines
+        max_width1 = max(len(line) + statisticsHWC(line) for line in lines1)
+        max_width2 = max(len(line) + statisticsHWC(line) for line in lines2)
+        max_width = max(max_width1, max_width2)
+        aligned_lines1 = buQiHang(lines1, max_width)
+        aligned_lines2 = buQiHang(lines2, max_width)
+        if len(aligned_lines1) < max_height:
+            aligned_lines1.extend([' ' * max_width] * (max_height - len(aligned_lines1)))
+        if len(aligned_lines2) < max_height:
+            aligned_lines2.extend([' ' * max_width] * (max_height - len(aligned_lines2)))
+        tlines = [f"{line1}{line2}" for line1, line2 in zip(aligned_lines1, aligned_lines2)]
         return '\n'.join(tlines)
 
 if __name__ == "__main__":
