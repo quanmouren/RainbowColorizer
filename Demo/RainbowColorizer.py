@@ -25,6 +25,13 @@ def interpolateColors(color1, color2, t):
     b = int(color1[2] + (color2[2] - color1[2]) * t)
     return r,g,b
 
+def statisticsHWC(text):  # 统计中文数量/统计全角字符数量
+    count = 0
+    for char in text:
+        if '\u4e00' <= char <= '\u9fff':
+            count += 1
+    return count
+
 class RC():
     def RainbowColorizer(text, start_color=(255, 255, 0), end_color=(0, 255, 255)):
         lines = text.split('\n')
@@ -62,9 +69,7 @@ class RC():
         if title == "":
             a = (filler * (size.columns-1))[:(size.columns-1)]
         else:
-            count = 0
-            for char in title:
-                if '\u4e00' <= char <= '\u9fff':count += 1
+            count = statisticsHWC(title)
             a = (filler * 4)[:4] + f" {title} " + (filler * (size.columns - len(title) - 7))[:(size.columns - len(title) - 7 - count)]
         for index, char in enumerate(a):
             hue = int(360 * (index / size.columns))
@@ -114,7 +119,41 @@ class RC():
             text = text.replace(f"[bg({r},{g},{b})]", f"\033[48;2;{r};{g};{b}m")
         return text + "\033[0m"
     
-
+    def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
+        lines = text.split("\n")
+        if not isinstance(filler, list):
+            if filler == "help" or filler == "?":
+                for i in range(1,7):
+                    _help = f"mode:{i}"
+                    print(RC.border(_help,i))
+                filler = ["┌", "┐", "└", "┘", "─", "│"]
+            elif filler == 1:filler = ["┌", "┐", "└", "┘", "─", "│"]
+            elif filler == 2:filler = ["╔", "╗", "╚", "╝", "═", "║"]
+            elif filler == 3:filler = ["┏", "┓", "┗", "┛", "━", "┃"]
+            elif filler == 4:filler = ["╭", "╮", "╰", "╯", "─", "│"]
+            elif filler == 5:filler = ["┍", "┑", "┕", "┙", "━", "│"]
+            elif filler == 6:filler = ["┎", "┒", "┖", "┚", "─", "┃"]
+            else:filler = [filler, filler, filler, filler, filler, filler]
+        max_width = max(len(line)+statisticsHWC(line) for line in lines)
+        if kwargs.get("title"):
+            a = f"{filler[0]}{kwargs.get("title")}{filler[4] * (max_width-((statisticsHWC(kwargs.get("title")))+len(kwargs.get("title"))))}{filler[1]}"
+        else:
+            a = f"{filler[0]}{filler[4] * (max_width)}{filler[1]}"
+        for line in lines:
+            a += f"\n{filler[5]}{line}{(max_width-(len(line)+statisticsHWC(line)))*" "}{filler[5]}"
+        a += f"\n{filler[2]}{filler[4] * (max_width)}{filler[3]}"
+        if RCdef == RC.RainbowColorizer:
+            if kwargs.get("color1") and kwargs.get("color2"):
+                return RCdef(a,kwargs.get("color1"),kwargs.get("color2"))
+            else:
+                return RCdef(a)
+        elif RCdef == RC.colors4:
+            if kwargs.get("color1") and kwargs.get("color2") and kwargs.get("color3") and kwargs.get("color4"):
+                return RCdef(a,kwargs.get("color1"),kwargs.get("color2"),kwargs.get("color3"),kwargs.get("color4"))
+            else:
+                return RCdef(a)
+        else:
+            return RC.RainbowColorizer(a)
 
 
 if __name__ == "__main__":
