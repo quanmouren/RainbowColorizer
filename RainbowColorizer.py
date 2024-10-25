@@ -19,19 +19,15 @@ def hue_to_rgb(hue, saturation=1, value=1):
     return int(r * 255), int(g * 255), int(b * 255)
 
 def interpolateColors(color1, color2, t):
-    # Linear interpolation between two RGB colors
     r = int(color1[0] + (color2[0] - color1[0]) * t)
     g = int(color1[1] + (color2[1] - color1[1]) * t)
     b = int(color1[2] + (color2[2] - color1[2]) * t)
     return r,g,b
 
-def statisticsHWC(text):  # 统计中文数量/统计全角字符数量
-    """
-    bug:没有计算中文标点符号
-    """
+def statisticsHWC(text):
     count = 0
     for char in text:
-        if '\u4e00' <= char <= '\u9fff':
+        if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303F':
             count += 1
     return count
 
@@ -124,7 +120,7 @@ class RC():
     
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
         """
-        有个bug空格和中文会导致计算颜色时越长的内容颜色计算错误
+        bug:在计算颜色时忽略了全角字符长度问题,导致染色错位
         """
         lines = text.split("\n")
         if not isinstance(filler, list):
