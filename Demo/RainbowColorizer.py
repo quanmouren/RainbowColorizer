@@ -154,6 +154,8 @@ class RC():
                 return RCdef(a)
         else:
             return RC.RainbowColorizer(a)
+    def r(text):
+        return re.sub(r'\033\[[\d;]*m', '', text)
 
 
 if __name__ == "__main__":
