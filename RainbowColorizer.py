@@ -125,8 +125,6 @@ class RC():
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
         """
         有个bug空格和中文会导致计算颜色时越长的内容颜色计算错误
-        右侧会出现多余的空格
-
         """
         lines = text.split("\n")
         if not isinstance(filler, list):
