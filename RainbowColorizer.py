@@ -193,6 +193,34 @@ class RC():
         tlines = [f"{line1}{line2}" for line1, line2 in zip(aligned_lines1, aligned_lines2)]
         return '\n'.join(tlines)
 
+def printr(*args, **kwargs):
+    lines = []
+    for arg in args:
+        if isinstance(arg, str):
+            lines.append(RC.RainbowColorizer(arg))
+        elif arg is None:
+            lines.append(RC.color("[bbu]None"))
+        elif isinstance(arg, dict):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(161,141,209),(251,194,235)))
+        elif isinstance(arg, tuple):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(248,54,0),(249,212,35)))
+        elif isinstance(arg, list):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(32,226,215),(209,254,125)))
+        elif isinstance(arg, bool):
+            if arg:
+                lines.append(RC.color("[bgn]True"))
+            else:
+                lines.append(RC.color("[brd]False"))
+        elif isinstance(arg, (int, float)):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(0,122,223),(73,90,255))) 
+        else:
+            lines.append(arg)
+    text = ' '.join(str(line) for line in lines)
+    print(text, **kwargs)
+
+
+
+
 if __name__ == "__main__":
     logo = r"""  _____       _       _                      _____      _            _              
  |  __ \     (_)     | |                    / ____|    | |          (_)             

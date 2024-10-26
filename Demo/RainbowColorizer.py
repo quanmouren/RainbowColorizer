@@ -19,19 +19,15 @@ def hue_to_rgb(hue, saturation=1, value=1):
     return int(r * 255), int(g * 255), int(b * 255)
 
 def interpolateColors(color1, color2, t):
-    # Linear interpolation between two RGB colors
     r = int(color1[0] + (color2[0] - color1[0]) * t)
     g = int(color1[1] + (color2[1] - color1[1]) * t)
     b = int(color1[2] + (color2[2] - color1[2]) * t)
     return r,g,b
 
-def statisticsHWC(text):  # 统计中文数量/统计全角字符数量
-    """
-    bug:没有计算中文标点符号
-    """
+def statisticsHWC(text):
     count = 0
     for char in text:
-        if '\u4e00' <= char <= '\u9fff':
+        if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303F':
             count += 1
     return count
 
@@ -124,7 +120,7 @@ class RC():
     
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
         """
-        有个bug空格和中文会导致计算颜色时越长的内容颜色计算错误
+        bug:在计算颜色时忽略了全角字符长度问题,导致染色错位
         """
         lines = text.split("\n")
         if not isinstance(filler, list):
@@ -172,26 +168,58 @@ class RC():
             a_lines.append(f"{(max_width - (len(line) + statisticsHWC(line))) * ' '}{line}")
         return '\n'.join(a_lines)
 
-    def joinH(text1,text2):
+    def joinH(text1, text2):
         text1 = RC.r(text1)
         text2 = RC.r(text2)
         lines1 = text1.split('\n')
         lines2 = text2.split('\n')
         max_height = max(len(lines1), len(lines2))
-        min_height = min(len(lines1), len(lines2))
-        def buQiHangShu(lines):
-            max_width = max(len(line) + statisticsHWC(line) for line in lines)
+        def buQiHang(lines, max_width):
             a_lines = []
             for line in lines:
-                a_lines.append(f"{line}{(max_width - (len(line) + statisticsHWC(line))) * ' '}")
-            a = '\n'.join(a_lines) + (("\n" + (" " * max_width)) * (max_height - min_height))
-            return a.split('\n')
-        lines2 = buQiHangShu(lines2)
-        lines1 = buQiHangShu(lines1)
-        tlines = []
-        for i in range(len(lines1)):
-            tlines.append(f"{lines1[i]}{lines2[i]}")
+                line_width = len(line) + statisticsHWC(line)
+                padding = ' ' * (max_width - line_width)
+                a_lines.append(line + padding)
+            return a_lines
+        max_width1 = max(len(line) + statisticsHWC(line) for line in lines1)
+        max_width2 = max(len(line) + statisticsHWC(line) for line in lines2)
+        max_width = max(max_width1, max_width2)
+        aligned_lines1 = buQiHang(lines1, max_width)
+        aligned_lines2 = buQiHang(lines2, max_width)
+        if len(aligned_lines1) < max_height:
+            aligned_lines1.extend([' ' * max_width] * (max_height - len(aligned_lines1)))
+        if len(aligned_lines2) < max_height:
+            aligned_lines2.extend([' ' * max_width] * (max_height - len(aligned_lines2)))
+        tlines = [f"{line1}{line2}" for line1, line2 in zip(aligned_lines1, aligned_lines2)]
         return '\n'.join(tlines)
+
+def printr(*args, **kwargs):
+    lines = []
+    for arg in args:
+        if isinstance(arg, str):
+            lines.append(RC.RainbowColorizer(arg))
+        elif arg is None:
+            lines.append(RC.color("[bbu]None"))
+        elif isinstance(arg, dict):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(161,141,209),(251,194,235)))
+        elif isinstance(arg, tuple):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(248,54,0),(249,212,35)))
+        elif isinstance(arg, list):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(32,226,215),(209,254,125)))
+        elif isinstance(arg, bool):
+            if arg:
+                lines.append(RC.color("[bgn]True"))
+            else:
+                lines.append(RC.color("[brd]False"))
+        elif isinstance(arg, (int, float)):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(0,122,223),(73,90,255))) 
+        else:
+            lines.append(arg)
+    text = ' '.join(str(line) for line in lines)
+    print(text, **kwargs)
+
+
+
 
 if __name__ == "__main__":
     logo = r"""  _____       _       _                      _____      _            _              
