@@ -18,6 +18,14 @@ def hue_to_rgb(hue, saturation=1, value=1):
     else:r, g, b = value, p, q
     return int(r * 255), int(g * 255), int(b * 255)
 
+def hex_to_rgb(hex_code):
+    hex_code = hex_code.lstrip('#')
+    rgb = tuple(int(hex_code[i:i+2], 16) for i in (0, 2 ,4))
+    return rgb
+
+def rgb_to_hex(rgb):
+    return "#{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
+
 def interpolateColors(color1, color2, t):
     r = int(color1[0] + (color2[0] - color1[0]) * t)
     g = int(color1[1] + (color2[1] - color1[1]) * t)
@@ -192,6 +200,15 @@ class RC():
             aligned_lines2.extend([' ' * max_width] * (max_height - len(aligned_lines2)))
         tlines = [f"{line1}{line2}" for line1, line2 in zip(aligned_lines1, aligned_lines2)]
         return '\n'.join(tlines)
+    
+    def logo():
+        logo = r""" _____       _       _                      _____      _            _              
+|  __ \     (_)     | |                    / ____|    | |          (_)             
+| |__) |__ _ _ _ __ | |__   _____      __ | |     ___ | | ___  _ __ _ _______ _ __ 
+|  _  // _` | | '_ \| '_ \ / _ \ \ /\ / / | |    / _ \| |/ _ \| '__| |_  / _ | '__|
+| | \ | (_| | | | | | |_) | (_) \ V  V /  | |___| (_) | | (_) | |  | |/ |  __| |   
+|_|  \_\__,_|_|_| |_|_.__/ \___/ \_/\_/    \_____\___/|_|\___/|_|  |_/___\___|_|"""
+        print(RC.RainbowColorizer(logo))
 
 def printr(*args, **kwargs):
     lines = []
@@ -222,13 +239,7 @@ def printr(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    logo = r"""  _____       _       _                      _____      _            _              
- |  __ \     (_)     | |                    / ____|    | |          (_)             
- | |__) |__ _ _ _ __ | |__   _____      __ | |     ___ | | ___  _ __ _ _______ _ __ 
- |  _  // _` | | '_ \| '_ \ / _ \ \ /\ / / | |    / _ \| |/ _ \| '__| |_  / _ | '__|
- | | \ | (_| | | | | | |_) | (_) \ V  V /  | |___| (_) | | (_) | |  | |/ |  __| |   
- |_|  \_\__,_|_|_| |_|_.__/ \___/ \_/\_/    \_____\___/|_|\___/|_|  |_/___\___|_|"""
-    print(RC.RainbowColorizer(logo))
+    RC.logo()
     print(RC.RainbowColorizer("Welcome to Rainbow Colorizer"))
     RC.separator("/","Better looking dividing lines")
     print(RC.RainbowColorizer("Use ") + "\033[31m[red]ANSI\033[0m" + RC.RainbowColorizer(" escape sequences more easily"))
