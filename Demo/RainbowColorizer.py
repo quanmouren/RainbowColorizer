@@ -240,10 +240,3 @@ def printr(*args, **kwargs):
 
 if __name__ == "__main__":
     RC.logo()
-    print(RC.RainbowColorizer("Welcome to Rainbow Colorizer"))
-    RC.separator("/","Better looking dividing lines")
-    print(RC.RainbowColorizer("Use ") + "\033[31m[red]ANSI\033[0m" + RC.RainbowColorizer(" escape sequences more easily"))
-    text = """##################\nCooler  four-color \ngradient rendering 
-function\n##################"""
-    print(RC.colors4(text))
-    print(RC.color("[bg(255,192,203)][red]Simpler background color dyeing[r]"))
