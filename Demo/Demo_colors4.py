@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from RainbowColorizer import RC
 
 a = """######################################################################
@@ -15,4 +18,3 @@ a = """######################################################################
 print(RC.colors4(a))
 RC.separator()
 print(RC.colors4(a,(255,0,0),(0,255,0),(0,0,255),(255,255,0)))
-

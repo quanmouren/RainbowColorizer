@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from RainbowColorizer import hex_to_rgb,rgb_to_hex,RC
 
 r,g,b = hex_to_rgb("#002FA7")

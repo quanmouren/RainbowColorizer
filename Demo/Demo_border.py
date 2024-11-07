@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from RainbowColorizer import RC
 
 a = "Let life be beautiful like summer flowers and death like autumn leaves"

@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from RainbowColorizer import RC
 
 RC.separator("/*-+","title")  # 分割线支持任意数量的半角字符 The separator line supports any number of half-width characters

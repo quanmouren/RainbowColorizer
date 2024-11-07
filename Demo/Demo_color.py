@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from RainbowColorizer import RC
 
 print(RC.color("使用[]快速调用颜色"))
