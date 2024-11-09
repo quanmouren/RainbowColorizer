@@ -39,6 +39,35 @@ def statisticsHWC(text):
             count += 1
     return count
 
+def printr(*args, **kwargs):
+    lines = []
+    for arg in args:
+        if isinstance(arg, str):
+            pattern = re.compile(r'^(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
+            if pattern.match(arg):
+                lines.append(RC.RainbowColorizer(rf"{str(arg)}",(162,65,246),(54,0,204)))
+            else:
+                lines.append(RC.RainbowColorizer(arg))
+        elif arg is None:
+            lines.append(RC.color("[bbu]None"))
+        elif isinstance(arg, dict):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(161,141,209),(251,194,235)))
+        elif isinstance(arg, tuple):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(248,54,0),(249,212,35)))
+        elif isinstance(arg, list):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(32,226,215),(209,254,125)))
+        elif isinstance(arg, bool):
+            if arg:
+                lines.append(RC.color("[bgn]True"))
+            else:
+                lines.append(RC.color("[brd]False"))
+        elif isinstance(arg, (int, float)):
+            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(0,122,223),(73,90,255))) 
+        else:
+            lines.append(arg)
+    text = ' '.join(str(line) for line in lines)
+    print(text, **kwargs)
+    
 class RC():
     def RainbowColorizer(text, start_color=(255, 255, 0), end_color=(0, 255, 255)):
         lines = text.split('\n')
@@ -48,7 +77,7 @@ class RC():
         for line_index, line in enumerate(lines):
             for char_index, char in enumerate(line.ljust(max_length)):
                 diagonal_pos = line_index + char_index
-                if max_length < 5: max_length = 5
+                if max_length < 8: max_length = 8  # 染色最短长度
                 t = diagonal_pos / (num_lines + max_length - 2)
                 r,g,b = interpolateColors(start_color,end_color,t)
                 result += f"\033[38;2;{r};{g};{b}m{char}"
@@ -209,33 +238,6 @@ class RC():
 | | \ | (_| | | | | | |_) | (_) \ V  V /  | |___| (_) | | (_) | |  | |/ |  __| |   
 |_|  \_\__,_|_|_| |_|_.__/ \___/ \_/\_/    \_____\___/|_|\___/|_|  |_/___\___|_|"""
         print(RC.RainbowColorizer(logo))
-
-def printr(*args, **kwargs):
-    lines = []
-    for arg in args:
-        if isinstance(arg, str):
-            lines.append(RC.RainbowColorizer(arg))
-        elif arg is None:
-            lines.append(RC.color("[bbu]None"))
-        elif isinstance(arg, dict):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(161,141,209),(251,194,235)))
-        elif isinstance(arg, tuple):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(248,54,0),(249,212,35)))
-        elif isinstance(arg, list):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(32,226,215),(209,254,125)))
-        elif isinstance(arg, bool):
-            if arg:
-                lines.append(RC.color("[bgn]True"))
-            else:
-                lines.append(RC.color("[brd]False"))
-        elif isinstance(arg, (int, float)):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(0,122,223),(73,90,255))) 
-        else:
-            lines.append(arg)
-    text = ' '.join(str(line) for line in lines)
-    print(text, **kwargs)
-
-
 
 
 if __name__ == "__main__":
