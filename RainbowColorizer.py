@@ -35,7 +35,8 @@ def interpolateColors(color1, color2, t):
 def statisticsHWC(text):
     count = 0
     for char in text:
-        if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303F':
+        if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303F' or '\uff00' <= char <= '\uffff':
+#          中文汉字                         中文符号                         全角符号  ？双字节字符[^\x00-\xff] ？中文符号[\u4e00-\u9fa5]
             count += 1
     return count
 
