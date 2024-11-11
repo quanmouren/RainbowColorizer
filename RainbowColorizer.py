@@ -36,7 +36,7 @@ def statisticsHWC(text):
     count = 0
     for char in text:
         if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303F' or '\uff00' <= char <= '\uffff':
-#          中文汉字                         中文符号                         全角符号  ？双字节字符[^\x00-\xff] ？中文符号[\u4e00-\u9fa5]
+#          中文汉字                         中文符号                         全角符号               ？双字节字符[^\x00-\xff] ？中文符号[\u4e00-\u9fa5]
             count += 1
     return count
 
@@ -128,6 +128,8 @@ class RC():
         text = replacer(text, ["青色","青","cyan","cn"], "\033[36m")
         text = replacer(text, ["白色","白","white","wh"], "\033[37m")
         text = replacer(text, ["黑色","黑","black","bk"], "\033[30m")
+        text = replacer(text, ["粉色","粉","pink","pk"], "\033[38;2;224;179;191m")
+
         text = replacer(text, ["亮红色","亮红","bred","brd"], "\033[91m")
         text = replacer(text, ["亮绿色","亮绿","bgreen","bgn"], "\033[92m")
         text = replacer(text, ["亮黄色","亮黄","byellow","bye"], "\033[93m")
@@ -136,6 +138,8 @@ class RC():
         text = replacer(text, ["亮青色","亮青","bcyan","bcn"], "\033[96m")
         text = replacer(text, ["亮白色","亮白","bwhite","bwh"], "\033[97m")
         text = replacer(text, ["亮黑色","亮黑","bblack","bbk"], "\033[90m")
+        text = replacer(text, ["亮粉色","亮粉","bpink","bpk"], "\033[38;2;255;200;220m")
+
         text = replacer(text, ["背景红","背景红色","bgred","bgrd"], "\033[41m")
         text = replacer(text, ["背景绿","背景绿色","bggreen","bggn"], "\033[42m")
         text = replacer(text, ["背景黄","背景黄色","bgyellow","bgye"], "\033[43m")
@@ -144,6 +148,23 @@ class RC():
         text = replacer(text, ["背景青","背景青色","bgcyan","bgcn"], "\033[46m")
         text = replacer(text, ["背景白","背景白色","bgwhite","bgwh"], "\033[47m")
         text = replacer(text, ["背景黑","背景黑色","bgblack","bgbk"], "\033[40m")
+        text = replacer(text, ["背景粉","背景粉色","bgpink","bgpk"], "\033[48;2;255;192;203m")
+
+        text = replacer(text, ["粗体","1","B"], "\033[1m")
+        text = replacer(text, ["半亮度","2","H"], "\033[2m")
+        text = replacer(text, ["斜体","3","I"], "\033[3m")
+        text = replacer(text, ["下划线","4","U"], "\033[4m")
+        text = replacer(text, ["颜色反转","7","reverse"], "\033[7m")
+        text = replacer(text, ["删除线", "strikethrough", "S","9"], "\033[9m")
+        text = replacer(text, ["隐藏", "hidden", "hide","8"], "\033[8m")
+
+        text = replacer(text, ["鼠标上","up","UP"], "\033[A")
+        text = replacer(text, ["鼠标下","dn","DN"], "\033[B")
+        text = replacer(text, ["鼠标左","L"],"\033[D")
+        text = replacer(text, ["鼠标右","R"],"\033[C")
+        text = replacer(text, ["保存光标位置","save-cursor-pos"], "\033[s")
+        text = replacer(text, ["恢复光标位置","restore-cursor-pos"], "\033[u")
+
         pattern = r"\[\((\d+),(\d+),(\d+)\)\]"
         matches = re.findall(pattern, text)
         for match in matches:
@@ -154,6 +175,12 @@ class RC():
         for match in matches:
             r, g, b = map(int, match)
             text = text.replace(f"[bg({r},{g},{b})]", f"\033[48;2;{r};{g};{b}m")
+        pattern = r'\[Rainbow(.*?)\]'
+        matches = re.findall(pattern, text)
+        for match in matches:
+            text = text.replace(f"[Rainbow{match}]", RC.RainbowColorizer(match))
+
+
         return text + "\033[0m"
     
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
