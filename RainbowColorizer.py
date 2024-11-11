@@ -162,8 +162,8 @@ class RC():
         text = replacer(text, ["鼠标下","dn","DN"], "\033[B")
         text = replacer(text, ["鼠标左","L"],"\033[D")
         text = replacer(text, ["鼠标右","R"],"\033[C")
-        text = replacer(text, ["保存光标位置","save-cursor-pos"], "\033[s")
-        text = replacer(text, ["恢复光标位置","restore-cursor-pos"], "\033[u")
+        text = replacer(text, ["保存光标位置","save"], "\033[s")
+        text = replacer(text, ["恢复光标位置","restore"], "\033[u")
 
         pattern = r"\[\((\d+),(\d+),(\d+)\)\]"
         matches = re.findall(pattern, text)
