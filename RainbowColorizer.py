@@ -40,34 +40,87 @@ def statisticsHWC(text):
             count += 1
     return count
 
-def printr(*args, **kwargs):
-    lines = []
-    for arg in args:
-        if isinstance(arg, str):
-            pattern = re.compile(r'^(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
-            if pattern.match(arg):
-                lines.append(RC.RainbowColorizer(rf"{str(arg)}",(162,65,246),(54,0,204)))
+class printr:
+    def __init__(self):
+        self.on_bool = True
+        self.TrueColor = "[bgn]"
+        self.FalseColor = "[brd]"
+        self.on_None = True
+        self.NoneColor = "[bbu]"
+        self.on_path = True
+        self.pathColor = [(162,65,246),(54,0,204)]
+        self.on_dict = True
+        self.dictColor = [(161,141,209),(251,194,235)]
+        self.on_tuple = True
+        self.tupleColor = [(248,54,0),(249,212,35)]
+        self.on_list = True
+        self.listColor = [(32,226,215),(209,254,125)]
+        self.on_int = True
+        self.intColor = [(0,122,223),(73,90,255)]
+        self.on_info = True
+        self.infoColor = [(255,255,0),(0,255,255)]
+        
+    def __call__(self, *args, **kwargs):
+        lines = []
+        for arg in args:
+            if isinstance(arg, str):
+                pattern = re.compile(r'^(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
+                if pattern.match(arg):
+                    if self.on_path:
+                        lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.pathColor[0],self.pathColor[1]))
+                    else:
+                        lines.append(arg)
+                else:
+                    if self.on_info:
+                        lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.infoColor[0],self.infoColor[1]))
+                    else:
+                        lines.append(arg)
+            elif arg is None:
+                if self.on_None:
+                    lines.append(RC.color(f"{self.NoneColor}None"))
+                else:
+                    lines.append(arg)
+            elif isinstance(arg, dict):
+                if self.on_dict:
+                    lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.dictColor[0],self.dictColor[1]))
+                else:
+                    lines.append(arg)
+            elif isinstance(arg, tuple):
+                if self.on_tuple:
+                    lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.tupleColor[0],self.tupleColor[1]))
+                else:
+                    lines.append(arg)
+            elif isinstance(arg, list):
+                if self.on_list:
+                    lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.listColor[0],self.listColor[1]))
+                else:
+                    lines.append(arg)
+            elif isinstance(arg, bool):
+                if self.on_bool:
+                    if arg:
+                        lines.append(RC.color(f"{self.TrueColor}True"))
+                    else:
+                        lines.append(RC.color(f"{self.FalseColor}False"))
+                else:
+                    lines.append(arg)
+            elif isinstance(arg, (int, float)):
+                if self.on_int:
+                    lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.intColor[0],self.intColor[1]))
+                else:
+                    lines.append(arg)
             else:
-                lines.append(RC.RainbowColorizer(arg))
-        elif arg is None:
-            lines.append(RC.color("[bbu]None"))
-        elif isinstance(arg, dict):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(161,141,209),(251,194,235)))
-        elif isinstance(arg, tuple):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(248,54,0),(249,212,35)))
-        elif isinstance(arg, list):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(32,226,215),(209,254,125)))
-        elif isinstance(arg, bool):
-            if arg:
-                lines.append(RC.color("[bgn]True"))
-            else:
-                lines.append(RC.color("[brd]False"))
-        elif isinstance(arg, (int, float)):
-            lines.append(RC.RainbowColorizer(rf"{str(arg)}",(0,122,223),(73,90,255))) 
-        else:
-            lines.append(arg)
-    text = ' '.join(str(line) for line in lines)
-    print(text, **kwargs)
+                lines.append(arg)
+        text = ' '.join(str(line) for line in lines)
+        print(text, **kwargs)
+    def style_1(self):
+        self.on_info = False
+        self.on_dict = False
+        self.on_tuple = False
+        self.on_list = False
+        self.on_int = False
+
+
+
     
 class RC():
     def RainbowColorizer(text, start_color=(255, 255, 0), end_color=(0, 255, 255)):
