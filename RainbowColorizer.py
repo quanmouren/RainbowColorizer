@@ -41,7 +41,8 @@ def statisticsHWC(text):
     return count
 
 class printr:
-    def __init__(self):
+    def __init__(self,title=None):
+        self.title = title
         self.on_bool = True
         self.TrueColor = "[bgn]"
         self.FalseColor = "[brd]"
@@ -62,6 +63,8 @@ class printr:
         
     def __call__(self, *args, **kwargs):
         lines = []
+        if self.title != None:
+            lines.append(self.title + ":")
         for arg in args:
             if isinstance(arg, str):
                 pattern = re.compile(r'^(?:(?:[a-zA-Z]:|\.{1,2})?[\\/](?:[^\\?/*|<>:"]+[\\/])*)(?:(?:[^\\?/*|<>:"]+?)(?:\.[^.\\?/*|<>:"]+)?)?$')
@@ -105,7 +108,10 @@ class printr:
                     lines.append(arg)
             elif isinstance(arg, (int, float)):
                 if self.on_int:
-                    lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.intColor[0],self.intColor[1]))
+                    if arg == 20060726:
+                        lines.append(RC.color("[(135,206,235)]20060726"))
+                    else:
+                        lines.append(RC.RainbowColorizer(rf"{str(arg)}",self.intColor[0],self.intColor[1]))
                 else:
                     lines.append(arg)
             else:
@@ -118,10 +124,10 @@ class printr:
         self.on_tuple = False
         self.on_list = False
         self.on_int = False
+        self.on_bool = True
+        self.on_None = True
+        self.on_path = True
 
-
-
-    
 class RC():
     def RainbowColorizer(text, start_color=(255, 255, 0), end_color=(0, 255, 255)):
         lines = text.split('\n')
@@ -218,12 +224,12 @@ class RC():
         text = replacer(text, ["保存光标位置","save"], "\033[s")
         text = replacer(text, ["恢复光标位置","restore"], "\033[u")
 
-        pattern = r"\[\((\d+),(\d+),(\d+)\)\]"
+        pattern = r'\[\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)\]'
         matches = re.findall(pattern, text)
         for match in matches:
             r, g, b = map(int, match)
             text = text.replace(f"[({r},{g},{b})]", f"\033[38;2;{r};{g};{b}m")
-        pattern = r'\[bg\((\d+),(\d+),(\d+)\)\]'
+        pattern = r'\[bg\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)\]'
         matches = re.findall(pattern, text)
         for match in matches:
             r, g, b = map(int, match)
@@ -232,10 +238,8 @@ class RC():
         matches = re.findall(pattern, text)
         for match in matches:
             text = text.replace(f"[Rainbow{match}]", RC.RainbowColorizer(match))
-
-
         return text + "\033[0m"
-    
+
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
         """
         bug:在计算颜色时忽略了全角字符长度问题,导致染色错位
