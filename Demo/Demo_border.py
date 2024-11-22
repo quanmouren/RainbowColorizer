@@ -16,3 +16,5 @@ Difficult to communicate between different intelligent species.
 Every civilization has a long lifespan.
                                                         ——The three body problem"""
 print(RC.border(a,4,RC.colors4,title='The Dark Forest Theory',color1=(255,192,203),color2=(255,153,192),color3=(245,212,217),color4=(218,112,214)))
+a = RC.colors4("Heavy elements precipitated out of darkness, \nso darkness, not light, is the mother of civilization.")
+print(RC.border(a,4,retain=True))

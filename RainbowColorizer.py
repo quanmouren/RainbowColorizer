@@ -240,44 +240,95 @@ class RC():
             text = text.replace(f"[Rainbow{match}]", RC.RainbowColorizer(match))
         return text + "\033[0m"
 
-    def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,**kwargs):
+    def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,retain=False,**kwargs):
         """
         bug:在计算颜色时忽略了全角字符长度问题,导致染色错位
+        未完善:retain=True时自定义颜色过度
         """
-        lines = text.split("\n")
-        if not isinstance(filler, list):
-            if filler == "help" or filler == "?":
-                for i in range(1,7):
-                    _help = f"mode:{i}"
-                    print(RC.border(_help,i))
-                filler = ["┌", "┐", "└", "┘", "─", "│"]
-            elif filler == 1:filler = ["┌", "┐", "└", "┘", "─", "│"]
-            elif filler == 2:filler = ["╔", "╗", "╚", "╝", "═", "║"]
-            elif filler == 3:filler = ["┏", "┓", "┗", "┛", "━", "┃"]
-            elif filler == 4:filler = ["╭", "╮", "╰", "╯", "─", "│"]
-            elif filler == 5:filler = ["┍", "┑", "┕", "┙", "━", "│"]
-            elif filler == 6:filler = ["┎", "┒", "┖", "┚", "─", "┃"]
-            else:filler = [filler, filler, filler, filler, filler, filler]
-        max_width = max(len(line)+statisticsHWC(line) for line in lines)
-        if kwargs.get("title"):
-            a = f"{filler[0]}{kwargs.get("title")}{filler[4] * (max_width-((statisticsHWC(kwargs.get("title")))+len(kwargs.get("title"))))}{filler[1]}"
-        else:
-            a = f"{filler[0]}{filler[4] * (max_width)}{filler[1]}"
-        for line in lines:
-            a += f"\n{filler[5]}{line}{(max_width-(len(line)+statisticsHWC(line)))*" "}{filler[5]}"
-        a += f"\n{filler[2]}{filler[4] * (max_width)}{filler[3]}"
-        if RCdef == RC.RainbowColorizer:
-            if kwargs.get("color1") and kwargs.get("color2"):
-                return RCdef(a,kwargs.get("color1"),kwargs.get("color2"))
+        if retain:
+            if not isinstance(filler, list):
+                if filler == "help" or filler == "?":
+                    for i in range(1,7):
+                        _help = f"mode:{i}"
+                        print(RC.border(_help,i))
+                    filler = ["┌", "┐", "└", "┘", "─", "│"]
+                elif filler == 1:filler = ["┌", "┐", "└", "┘", "─", "│"]
+                elif filler == 2:filler = ["╔", "╗", "╚", "╝", "═", "║"]
+                elif filler == 3:filler = ["┏", "┓", "┗", "┛", "━", "┃"]
+                elif filler == 4:filler = ["╭", "╮", "╰", "╯", "─", "│"]
+                elif filler == 5:filler = ["┍", "┑", "┕", "┙", "━", "│"]
+                elif filler == 6:filler = ["┎", "┒", "┖", "┚", "─", "┃"]
+                else:filler = [filler, filler, filler, filler, filler, filler]
+            lines = RC.r(text).split("\n")
+            max_width = max([len(line)+statisticsHWC(line) for line in lines])
+            if kwargs.get("title"):
+                a = f"{filler[0]}{kwargs.get("title")}{filler[4] * (max_width-((statisticsHWC(kwargs.get("title")))+len(kwargs.get("title"))))}{filler[1]}"
             else:
-                return RCdef(a)
-        elif RCdef == RC.colors4:
-            if kwargs.get("color1") and kwargs.get("color2") and kwargs.get("color3") and kwargs.get("color4"):
-                return RCdef(a,kwargs.get("color1"),kwargs.get("color2"),kwargs.get("color3"),kwargs.get("color4"))
-            else:
-                return RCdef(a)
+                a = f"{filler[0]}{filler[4] * (max_width)}{filler[1]}"
+            a += ("\n"+(filler[5]+(" "*max_width)+f"{filler[5]}\n")*len(lines)+filler[2]+(filler[4]*max_width)+f"{filler[3]}\n").rstrip('\n')
+
+            a = RCdef(a)
+            a = a.split("\n")
+            b = text.split("\n")
+            def match_regex(text):
+                pattern = r'\x1b\[38;2;\d{1,3};\d{1,3};\d{1,3}m.'
+                matches = list(re.finditer(pattern, text))
+                if not matches:
+                    return ""
+                first_match_end = matches[0].end()
+                last_match_start = matches[-1].start()
+                middle_content = text[first_match_end:last_match_start]
+                return middle_content
+
+            c = a[0]
+            if len(a) > 2:
+                middle_items = a[1:-1]
+                for i, item in enumerate(middle_items):
+                    zhongjianneirong = match_regex(item)
+                    beitihuandeneirong = "\033[0m"+b[i]+((max_width-(len(RC.r(b[i]))+statisticsHWC(RC.r(b[i]))))*" ")
+                    jieguo = item.replace(zhongjianneirong, beitihuandeneirong)
+                    c += "\n"+jieguo
+            c += "\n"+a[-1]
+            return c
         else:
-            return RC.RainbowColorizer(a)
+            lines = text.split("\n")
+            linea = []
+            for i in lines:
+                linea.append(RC.r(i))
+            lines = linea
+            if not isinstance(filler, list):
+                if filler == "help" or filler == "?":
+                    for i in range(1,7):
+                        _help = f"mode:{i}"
+                        print(RC.border(_help,i))
+                    filler = ["┌", "┐", "└", "┘", "─", "│"]
+                elif filler == 1:filler = ["┌", "┐", "└", "┘", "─", "│"]
+                elif filler == 2:filler = ["╔", "╗", "╚", "╝", "═", "║"]
+                elif filler == 3:filler = ["┏", "┓", "┗", "┛", "━", "┃"]
+                elif filler == 4:filler = ["╭", "╮", "╰", "╯", "─", "│"]
+                elif filler == 5:filler = ["┍", "┑", "┕", "┙", "━", "│"]
+                elif filler == 6:filler = ["┎", "┒", "┖", "┚", "─", "┃"]
+                else:filler = [filler, filler, filler, filler, filler, filler]
+            max_width = max(len(line)+statisticsHWC(line) for line in lines)
+            if kwargs.get("title"):
+                a = f"{filler[0]}{kwargs.get("title")}{filler[4] * (max_width-((statisticsHWC(kwargs.get("title")))+len(kwargs.get("title"))))}{filler[1]}"
+            else:
+                a = f"{filler[0]}{filler[4] * (max_width)}{filler[1]}"
+            for line in lines:
+                a += f"\n{filler[5]}{line}{(max_width-(len(line)+statisticsHWC(line)))*" "}{filler[5]}"
+            a += f"\n{filler[2]}{filler[4] * (max_width)}{filler[3]}"
+            if RCdef == RC.RainbowColorizer:
+                if kwargs.get("color1") and kwargs.get("color2"):
+                    return RCdef(a,kwargs.get("color1"),kwargs.get("color2"))
+                else:
+                    return RCdef(a)
+            elif RCdef == RC.colors4:
+                if kwargs.get("color1") and kwargs.get("color2") and kwargs.get("color3") and kwargs.get("color4"):
+                    return RCdef(a,kwargs.get("color1"),kwargs.get("color2"),kwargs.get("color3"),kwargs.get("color4"))
+                else:
+                    return RCdef(a)
+            else:
+                return RC.RainbowColorizer(a)
         
     def r(text):
         return re.sub(r'\033\[[\d;]*m', '', text)
@@ -291,29 +342,30 @@ class RC():
         return '\n'.join(a_lines)
 
     def joinH(text1, text2):
-        text1 = RC.r(text1)
-        text2 = RC.r(text2)
-        lines1 = text1.split('\n')
-        lines2 = text2.split('\n')
+        text1new = RC.r(text1)
+        text2new = RC.r(text2)
+        lines1 = text1new.split('\n')
+        lines2 = text2new.split('\n')
         max_height = max(len(lines1), len(lines2))
-        def buQiHang(lines, max_width):
+        def buQiHang(lines, max_width,text):
             a_lines = []
-            for line in lines:
-                line_width = len(line) + statisticsHWC(line)
+            for i in range(len(lines)):
+                line_width = len(lines[i]) + statisticsHWC(lines[i])
                 padding = ' ' * (max_width - line_width)
-                a_lines.append(line + padding)
+                a_lines.append(text[i] + padding)
             return a_lines
         max_width1 = max(len(line) + statisticsHWC(line) for line in lines1)
         max_width2 = max(len(line) + statisticsHWC(line) for line in lines2)
         max_width = max(max_width1, max_width2)
-        aligned_lines1 = buQiHang(lines1, max_width)
-        aligned_lines2 = buQiHang(lines2, max_width)
+        aligned_lines1 = buQiHang(lines1, max_width1,text1.split('\n'))
+        aligned_lines2 = buQiHang(lines2, max_width2,text2.split('\n'))
         if len(aligned_lines1) < max_height:
             aligned_lines1.extend([' ' * max_width] * (max_height - len(aligned_lines1)))
         if len(aligned_lines2) < max_height:
             aligned_lines2.extend([' ' * max_width] * (max_height - len(aligned_lines2)))
         tlines = [f"{line1}{line2}" for line1, line2 in zip(aligned_lines1, aligned_lines2)]
         return '\n'.join(tlines)
+    
     
     def logo():
         logo = r""" _____       _       _                      _____      _            _              
