@@ -160,15 +160,19 @@ class RC():
             result += "\033[0m\n"
         return result.rstrip('\n')
 
-    def separator(filler="-", title=""):
+    def separator(filler="-", title="",**kwargs):
+        MAX = kwargs.pop("MAX", None)
         size = shutil.get_terminal_size()
+        size = size.columns
+        if MAX is not None and MAX < size:
+            size = MAX
         if title == "":
-            a = (filler * (size.columns-1))[:(size.columns-1)]
+            a = (filler * (size-1))[:(size-1)]
         else:
             count = statisticsHWC(title)
-            a = (filler * 4)[:4] + f" {title} " + (filler * (size.columns - len(title) - 7))[:(size.columns - len(title) - 7 - count)]
+            a = (filler * 4)[:4] + f" {title} " + (filler * (size - len(title) - 7))[:(size - len(title) - 7 - count)]
         for index, char in enumerate(a):
-            hue = int(360 * (index / size.columns))
+            hue = int(360 * (index / size))
             rgb = hue_to_rgb(hue)
             print(RC.RainbowColorizer(char, rgb, rgb), end='')
         print("")
