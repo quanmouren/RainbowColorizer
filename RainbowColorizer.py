@@ -345,7 +345,8 @@ class RC():
     
     def right(text):
         lines = text.split("\n")
-        max_width = max(len(line) + statisticsHWC(line) for line in lines)
+        linesr = RC.r(text).split("\n")
+        max_width = max(len(line) + statisticsHWC(line) for line in linesr)
         a_lines = []
         for line in lines:
             a_lines.append(f"{(max_width - (len(line) + statisticsHWC(line))) * ' '}{line}")
