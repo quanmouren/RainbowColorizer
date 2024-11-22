@@ -243,7 +243,6 @@ class RC():
     def border(text, filler=["┌", "┐", "└", "┘", "─", "│"], RCdef=RainbowColorizer,retain=False,**kwargs):
         """
         bug:在计算颜色时忽略了全角字符长度问题,导致染色错位
-        未完善:retain=True时自定义颜色过度
         """
         if retain:
             if not isinstance(filler, list):
@@ -266,8 +265,16 @@ class RC():
             else:
                 a = f"{filler[0]}{filler[4] * (max_width)}{filler[1]}"
             a += ("\n"+(filler[5]+(" "*max_width)+f"{filler[5]}\n")*len(lines)+filler[2]+(filler[4]*max_width)+f"{filler[3]}\n").rstrip('\n')
-
-            a = RCdef(a)
+            if RCdef == RC.RainbowColorizer:
+                if kwargs.get("color1") and kwargs.get("color2"):
+                    a = RCdef(a,kwargs.get("color1"),kwargs.get("color2"))
+                else:
+                    a = RCdef(a)
+            elif RCdef == RC.colors4:
+                if kwargs.get("color1") and kwargs.get("color2") and kwargs.get("color3") and kwargs.get("color4"):
+                    a = RCdef(a,kwargs.get("color1"),kwargs.get("color2"),kwargs.get("color3"),kwargs.get("color4"))
+                else:
+                    a = RCdef(a)
             a = a.split("\n")
             b = text.split("\n")
             def match_regex(text):
@@ -279,7 +286,6 @@ class RC():
                 last_match_start = matches[-1].start()
                 middle_content = text[first_match_end:last_match_start]
                 return middle_content
-
             c = a[0]
             if len(a) > 2:
                 middle_items = a[1:-1]
