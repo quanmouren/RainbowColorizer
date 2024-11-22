@@ -348,15 +348,21 @@ class RC():
         linesr = RC.r(text).split("\n")
         max_width = max(len(line) + statisticsHWC(line) for line in linesr)
         a_lines = []
-        for line in lines:
-            a_lines.append(f"{(max_width - (len(line) + statisticsHWC(line))) * ' '}{line}")
+        for i in range(len(lines)):
+            a_lines.append(f"{(max_width - (len(linesr[i]) + statisticsHWC(linesr[i]))) * ' '}{lines[i]}")
         return '\n'.join(a_lines)
 
     def joinH(text1, text2):
+        """
+        bug:text2会添加过多的空格,可能因为使用的text1的长度
+        """
+        
         text1new = RC.r(text1)
         text2new = RC.r(text2)
         lines1 = text1new.split('\n')
         lines2 = text2new.split('\n')
+
+
         max_height = max(len(lines1), len(lines2))
         def buQiHang(lines, max_width,text):
             a_lines = []
